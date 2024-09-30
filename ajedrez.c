@@ -7,10 +7,10 @@ int main(void) {
     SetTargetFPS(10);
 
     Tablero t;
+    iniciarTexturas(&t);
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
         dibujarTablero(&t);
 
         EndDrawing();
