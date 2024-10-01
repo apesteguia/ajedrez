@@ -1,9 +1,12 @@
 #include "tablero.h"
 #include "pieza.h"
+#include "vec.h"
 #include <raylib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+void movimientosPosibles(Tablero *, Vec *, Vector2);
 
 void iniciarTablero(Tablero *t) {
     t->turnos = t->valorNegras = t->valorBlancas = 0;
@@ -143,6 +146,7 @@ void iniciarTexturas(Tablero *t) {
 
 void dibujarTablero(Tablero *t, const char *posiciones) {
     Color color;
+    Vec v;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             const int x = i * TAMANIO_PIEZA;
@@ -185,16 +189,27 @@ void dibujarTablero(Tablero *t, const char *posiciones) {
 
                 if (indiceTextura >= 0) {
                     if (pieza.color == Blanca) {
-                        DrawTexture(t->texturas.blancas[indiceTextura], x + TAMANIO_PIEZA / 4, y + TAMANIO_PIEZA / 4,
-                                    WHITE);
+                        DrawTexture(t->texturas.blancas[indiceTextura],
+                                    x + TAMANIO_PIEZA / 4,
+                                    y + TAMANIO_PIEZA / 4, WHITE);
                     } else if (pieza.color == Negra) {
-                        DrawTexture(t->texturas.negras[indiceTextura], x + TAMANIO_PIEZA / 4, y + TAMANIO_PIEZA / 4,
-                                    WHITE);
+                        DrawTexture(t->texturas.negras[indiceTextura],
+                                    x + TAMANIO_PIEZA / 4,
+                                    y + TAMANIO_PIEZA / 4, WHITE);
                     }
                 }
             }
         }
     }
+    Vector2 adf;
+    adf.x = 1;
+    adf.y = 1;
+    printf("Hsdfafasdfsadfas\n");
+    movimientosPosibles(t, &v, adf);
+    printf("HOLA\n");
+    Vector2 *ai = (Vector2 *)&v.array[0];
+    adf.x = ai->x;
+    // printf("\n%f %f\n\n", ai->x, ai->y);
 }
 
 void vaciarTexturas(Tablero *t) {
@@ -202,4 +217,50 @@ void vaciarTexturas(Tablero *t) {
         UnloadTexture(t->texturas.negras[i]);
         UnloadTexture(t->texturas.blancas[i]);
     }
+}
+
+bool esPosible(Tablero *t, Vector2 *current, Vector2 *dest) {
+    Pieza *cur = &t->piezas[(int)current->x][(int)current->y];
+    Pieza *des = &t->piezas[(int)dest->x][(int)dest->y];
+
+    if (cur->color == des->color)
+        return false;
+
+    return true;
+}
+
+void movimientosPosibles(Tablero *t, Vec *v, Vector2 pos) {
+    // Asegúrate de inicializar el vector
+    vec_init(v, sizeof(Vector2));
+
+    // Comprobar que pos.x y pos.y están dentro de los límites
+    if (pos.x < 0 || pos.x >= N || pos.y < 0 || pos.y >= N) {
+        printf("Posición fuera de límites\n");
+        return; // Salir si la posición no es válida
+    }
+
+    Pieza *p = &t->piezas[(int)pos.x][(int)pos.y];
+
+    if (p->tipo == Peon) {
+        Vector2 pasar;
+        if (p->color == Blanca) {
+            pasar = p->pos;
+            pasar.y++; // Mueve el peón hacia arriba
+            vec_push(v, &pasar);
+            if (esPosible(t, &p->pos, &pasar)) {
+                printf("DSFASFASDF\n");
+                vec_push(v, &pasar);
+            }
+        } else if (p->color == Negra) {
+            pasar = p->pos;
+            pasar.y--; // Mueve el peón hacia abajo
+            if (esPosible(t, &p->pos, &pasar)) {
+                vec_push(v, &pasar);
+            }
+        }
+    }
+    printf("DS1!!!!!!!!!F\n");
+    // Manejo para otras piezas puede ir aquí...
+
+    // No olvides hacer un break en los casos si se añade más lógica
 }

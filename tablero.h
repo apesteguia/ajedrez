@@ -10,6 +10,9 @@
 #define N 8
 #define TAMANIO_PIEZA WIDTH / N
 
+#define START_PEON_BLANCO 6
+#define START_PEON_NEGRO 1
+
 typedef struct {
     Texture2D blancas[N];
     Texture2D negras[N];
