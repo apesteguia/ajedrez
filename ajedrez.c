@@ -5,6 +5,7 @@ int main(void) {
     InitWindow(WIDTH, HEIGHT, "Ajedrez - Mikel Apesteguia");
 
     SetTargetFPS(10);
+    const char POSICIONES[N] = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 
     Tablero t;
     iniciarTexturas(&t);
@@ -13,7 +14,7 @@ int main(void) {
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        dibujarTablero(&t);
+        dibujarTablero(&t, POSICIONES);
 
         EndDrawing();
     }

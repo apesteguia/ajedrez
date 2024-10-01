@@ -111,11 +111,11 @@ void iniciarTablero(Tablero *t) {
 void iniciarTexturas(Tablero *t) {
     const char *nombresBlancas[N] = {"peon_blanco.png",    "alfil_blanco.png",
                                      "caballo_blanco.png", "torre_blanco.png",
-                                     "reina_blanco.png",    "rey_blanco.png"};
+                                     "reina_blanco.png",   "rey_blanco.png"};
 
     const char *nombresNegras[N] = {"peon_negro.png",    "alfil_negro.png",
                                     "caballo_negro.png", "torre_negro.png",
-                                    "reina_negro.png",    "rey_negro.png"};
+                                    "reina_negro.png",   "rey_negro.png"};
 
     char workingDir[512];
     strcpy(workingDir, GetWorkingDirectory());
@@ -141,7 +141,7 @@ void iniciarTexturas(Tablero *t) {
     }
 }
 
-void dibujarTablero(Tablero *t) {
+void dibujarTablero(Tablero *t, const char *posiciones) {
     Color color;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -154,6 +154,8 @@ void dibujarTablero(Tablero *t) {
                 color = GRAY;
             }
             DrawRectangle(x, y, TAMANIO_PIEZA, TAMANIO_PIEZA, color);
+            DrawText(TextFormat("%c%d", posiciones[i], N - j), x + 5, y + 5, 15,
+                     BLACK);
 
             Pieza pieza = t->piezas[i][j];
             if (pieza.tipo != Vacio) {
@@ -183,10 +185,10 @@ void dibujarTablero(Tablero *t) {
 
                 if (indiceTextura >= 0) {
                     if (pieza.color == Blanca) {
-                        DrawTexture(t->texturas.blancas[indiceTextura], x, y,
+                        DrawTexture(t->texturas.blancas[indiceTextura], x + TAMANIO_PIEZA / 4, y + TAMANIO_PIEZA / 4,
                                     WHITE);
                     } else if (pieza.color == Negra) {
-                        DrawTexture(t->texturas.negras[indiceTextura], x, y,
+                        DrawTexture(t->texturas.negras[indiceTextura], x + TAMANIO_PIEZA / 4, y + TAMANIO_PIEZA / 4,
                                     WHITE);
                     }
                 }

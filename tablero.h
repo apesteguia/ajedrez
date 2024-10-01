@@ -24,7 +24,7 @@ typedef struct {
 } Tablero;
 
 void iniciarTablero(Tablero *);
-void dibujarTablero(Tablero *);
+void dibujarTablero(Tablero *, const char *);
 void iniciarTexturas(Tablero *);
 void vaciarTexturas(Tablero *);
 
