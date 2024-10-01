@@ -24,11 +24,13 @@ typedef struct {
     bool ganador;
     int valorBlancas, valorNegras;
     Texturas texturas;
+    Vec *movimientosPosibles;
 } Tablero;
 
 void iniciarTablero(Tablero *);
 void dibujarTablero(Tablero *, const char *);
 void iniciarTexturas(Tablero *);
 void vaciarTexturas(Tablero *);
+void movimientosPosibles(Tablero *, Vector2);
 
 #endif

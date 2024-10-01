@@ -6,17 +6,19 @@
 #include <string.h>
 #include <unistd.h>
 
-void movimientosPosibles(Tablero *, Vec *, Vector2);
+static bool esMovimientoPosible(void *, void *);
+static void mostrarVector(void *);
+static void normalizarPos(Vector2 *);
+static void printVector2(Vector2);
 
 void iniciarTablero(Tablero *t) {
     t->turnos = t->valorNegras = t->valorBlancas = 0;
+    t->movimientosPosibles = vec_new(sizeof(Vector2));
 
-    // Inicializar el tablero con todas las piezas vacías
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             Vector2 v = {i, j};
-            nuevaPiezaVacia(&t->piezas[i][j],
-                            &v); // Inicializa cada posición vacía
+            nuevaPiezaVacia(&t->piezas[i][j], &v);
         }
     }
 
@@ -29,12 +31,12 @@ void iniciarTablero(Tablero *t) {
     for (int i = 0; i < N; i++) {
         // Peones blancos
         v = (Vector2){i, 1};
-        color = Blanca;
+        color = Negra;
         nuevaPiezaViva(&t->piezas[i][1], &tipo, &color, &v);
 
         // Peones negros
         v = (Vector2){i, 6};
-        color = Negra;
+        color = Blanca;
         nuevaPiezaViva(&t->piezas[i][6], &tipo, &color, &v);
     }
 
@@ -42,14 +44,14 @@ void iniciarTablero(Tablero *t) {
     tipo = Alfil;
     // Alfiles blancos
     v = (Vector2){2, 0};
-    color = Blanca;
+    color = Negra;
     nuevaPiezaViva(&t->piezas[2][0], &tipo, &color, &v);
     v = (Vector2){5, 0};
     nuevaPiezaViva(&t->piezas[5][0], &tipo, &color, &v);
 
     // Alfiles negros
     v = (Vector2){2, 7};
-    color = Negra;
+    color = Blanca;
     nuevaPiezaViva(&t->piezas[2][7], &tipo, &color, &v);
     v = (Vector2){5, 7};
     nuevaPiezaViva(&t->piezas[5][7], &tipo, &color, &v);
@@ -58,14 +60,14 @@ void iniciarTablero(Tablero *t) {
     tipo = Caballo;
     // Caballos blancos
     v = (Vector2){1, 0};
-    color = Blanca;
+    color = Negra;
     nuevaPiezaViva(&t->piezas[1][0], &tipo, &color, &v);
     v = (Vector2){6, 0};
     nuevaPiezaViva(&t->piezas[6][0], &tipo, &color, &v);
 
     // Caballos negros
     v = (Vector2){1, 7};
-    color = Negra;
+    color = Blanca;
     nuevaPiezaViva(&t->piezas[1][7], &tipo, &color, &v);
     v = (Vector2){6, 7};
     nuevaPiezaViva(&t->piezas[6][7], &tipo, &color, &v);
@@ -74,14 +76,14 @@ void iniciarTablero(Tablero *t) {
     tipo = Torre;
     // Torres blancas
     v = (Vector2){0, 0};
-    color = Blanca;
+    color = Negra;
     nuevaPiezaViva(&t->piezas[0][0], &tipo, &color, &v);
     v = (Vector2){7, 0};
     nuevaPiezaViva(&t->piezas[7][0], &tipo, &color, &v);
 
     // Torres negras
     v = (Vector2){0, 7};
-    color = Negra;
+    color = Blanca;
     nuevaPiezaViva(&t->piezas[0][7], &tipo, &color, &v);
     v = (Vector2){7, 7};
     nuevaPiezaViva(&t->piezas[7][7], &tipo, &color, &v);
@@ -90,24 +92,24 @@ void iniciarTablero(Tablero *t) {
     tipo = Reina;
     // Dama blanca
     v = (Vector2){3, 0};
-    color = Blanca;
+    color = Negra;
     nuevaPiezaViva(&t->piezas[3][0], &tipo, &color, &v);
 
     // Dama negra
     v = (Vector2){3, 7};
-    color = Negra;
+    color = Blanca;
     nuevaPiezaViva(&t->piezas[3][7], &tipo, &color, &v);
 
     // Reyes
     tipo = Rey;
     // Rey blanco
     v = (Vector2){4, 0};
-    color = Blanca;
+    color = Negra;
     nuevaPiezaViva(&t->piezas[4][0], &tipo, &color, &v);
 
     // Rey negro
     v = (Vector2){4, 7};
-    color = Negra;
+    color = Blanca;
     nuevaPiezaViva(&t->piezas[4][7], &tipo, &color, &v);
 }
 
@@ -146,7 +148,7 @@ void iniciarTexturas(Tablero *t) {
 
 void dibujarTablero(Tablero *t, const char *posiciones) {
     Color color;
-    Vec v;
+    Vector2 v;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             const int x = i * TAMANIO_PIEZA;
@@ -157,6 +159,17 @@ void dibujarTablero(Tablero *t, const char *posiciones) {
             } else {
                 color = GRAY;
             }
+
+            v.x = i;
+            v.y = j;
+            /*
+            if (vec_find(t->movimientosPosibles, &v, esMovimientoPosible) &&
+                !vec_empty(t->movimientosPosibles)) {
+                DrawRectangle(x, y, TAMANIO_PIEZA, TAMANIO_PIEZA, RED);
+            } else {
+
+            }
+            */
             DrawRectangle(x, y, TAMANIO_PIEZA, TAMANIO_PIEZA, color);
             DrawText(TextFormat("%c%d", posiciones[i], N - j), x + 5, y + 5, 15,
                      BLACK);
@@ -201,15 +214,15 @@ void dibujarTablero(Tablero *t, const char *posiciones) {
             }
         }
     }
+    /*
     Vector2 adf;
     adf.x = 1;
     adf.y = 1;
-    printf("Hsdfafasdfsadfas\n");
     movimientosPosibles(t, &v, adf);
-    printf("HOLA\n");
     Vector2 *ai = (Vector2 *)&v.array[0];
     adf.x = ai->x;
-    // printf("\n%f %f\n\n", ai->x, ai->y);
+    printf("\n%f %f\n\n", ai->x, ai->y);
+    */
 }
 
 void vaciarTexturas(Tablero *t) {
@@ -223,44 +236,64 @@ bool esPosible(Tablero *t, Vector2 *current, Vector2 *dest) {
     Pieza *cur = &t->piezas[(int)current->x][(int)current->y];
     Pieza *des = &t->piezas[(int)dest->x][(int)dest->y];
 
+    // printVector2(*current);
+    // printVector2(*dest);
+    if (des->tipo == Vacio)
+        return true;
     if (cur->color == des->color)
         return false;
 
     return true;
 }
 
-void movimientosPosibles(Tablero *t, Vec *v, Vector2 pos) {
-    // Asegúrate de inicializar el vector
-    vec_init(v, sizeof(Vector2));
+void movimientosPosibles(Tablero *t, Vector2 pos) {
+    vec_clear(t->movimientosPosibles);
+    vec_init(t->movimientosPosibles, sizeof(Vector2));
 
-    // Comprobar que pos.x y pos.y están dentro de los límites
-    if (pos.x < 0 || pos.x >= N || pos.y < 0 || pos.y >= N) {
-        printf("Posición fuera de límites\n");
-        return; // Salir si la posición no es válida
-    }
-
+    normalizarPos(&pos);
     Pieza *p = &t->piezas[(int)pos.x][(int)pos.y];
 
     if (p->tipo == Peon) {
+        printf("PEON\n");
         Vector2 pasar;
         if (p->color == Blanca) {
+            printf("PEON BLANCO\n");
             pasar = p->pos;
-            pasar.y++; // Mueve el peón hacia arriba
-            vec_push(v, &pasar);
+            pasar.y--;
             if (esPosible(t, &p->pos, &pasar)) {
-                printf("DSFASFASDF\n");
-                vec_push(v, &pasar);
+                pasar.y--;
+                vec_push(t->movimientosPosibles, &pasar);
             }
         } else if (p->color == Negra) {
             pasar = p->pos;
             pasar.y--; // Mueve el peón hacia abajo
             if (esPosible(t, &p->pos, &pasar)) {
-                vec_push(v, &pasar);
+                vec_push(t->movimientosPosibles, &pasar);
             }
         }
     }
-    printf("DS1!!!!!!!!!F\n");
-    // Manejo para otras piezas puede ir aquí...
+    vec_foreach(t->movimientosPosibles, mostrarVector);
+}
 
-    // No olvides hacer un break en los casos si se añade más lógica
+static void normalizarPos(Vector2 *v) {
+    // printf("\n%d %d \n", (int)v->x, (int)v->y);
+    v->x = (int)(v->x / 100);
+    v->y = (int)(v->y / 100);
+    printVector2(*v);
+}
+
+static bool esMovimientoPosible(void *a, void *b) {
+    Vector2 *x, *y;
+    x = (Vector2 *)a;
+    y = (Vector2 *)b;
+    return (x->x == y->x && x->y == y->y);
+}
+
+static void mostrarVector(void *elem) {
+    Vector2 *v = (Vector2 *)elem;
+    printVector2(*v);
+}
+
+static void printVector2(Vector2 v) {
+    printf("Vector2: %d %d\n", (int)v.x, (int)v.y);
 }

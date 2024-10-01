@@ -7,11 +7,17 @@ int main(void) {
     SetTargetFPS(10);
     const char POSICIONES[N] = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 
+    Vector2 posicionCursor;
     Tablero t;
     iniciarTexturas(&t);
     iniciarTablero(&t);
 
     while (!WindowShouldClose()) {
+        posicionCursor = GetMousePosition();
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            movimientosPosibles(&t, posicionCursor);
+        }
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
         dibujarTablero(&t, POSICIONES);
