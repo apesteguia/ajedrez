@@ -8,48 +8,119 @@
 void iniciarTablero(Tablero *t) {
     t->turnos = t->valorNegras = t->valorBlancas = 0;
 
-    iniciarTexturas(t);
-    // Peones
-    Vector2 v;
-    ColorPieza color;
-    TipoPieza tipo;
-    tipo = Peon;
+    // Inicializar el tablero con todas las piezas vacías
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            Vector2 v;
-            v.x = i;
-            v.y = j;
-            nuevaPiezaVacia(&t->piezas[i][j], &v);
+            Vector2 v = {i, j};
+            nuevaPiezaVacia(&t->piezas[i][j],
+                            &v); // Inicializa cada posición vacía
         }
     }
 
-    Vector2 v2;
-    ColorPieza cl;
-    TipoPieza ti = Peon;
+    Vector2 v;
+    TipoPieza tipo;
+    ColorPieza color;
+
+    // Peones
+    tipo = Peon;
     for (int i = 0; i < N; i++) {
-        cl = Blanca;
-        v2.y = 2;
-        v2.x = i;
-        nuevaPiezaViva(&t->piezas[i][1], &ti, &cl, &v2);
-        cl = Negra;
-        v2.y = 6;
-        nuevaPiezaViva(&t->piezas[i][6], &ti, &cl, &v2);
+        // Peones blancos
+        v = (Vector2){i, 1};
+        color = Blanca;
+        nuevaPiezaViva(&t->piezas[i][1], &tipo, &color, &v);
+
+        // Peones negros
+        v = (Vector2){i, 6};
+        color = Negra;
+        nuevaPiezaViva(&t->piezas[i][6], &tipo, &color, &v);
     }
+
+    // Alfiles
+    tipo = Alfil;
+    // Alfiles blancos
+    v = (Vector2){2, 0};
+    color = Blanca;
+    nuevaPiezaViva(&t->piezas[2][0], &tipo, &color, &v);
+    v = (Vector2){5, 0};
+    nuevaPiezaViva(&t->piezas[5][0], &tipo, &color, &v);
+
+    // Alfiles negros
+    v = (Vector2){2, 7};
+    color = Negra;
+    nuevaPiezaViva(&t->piezas[2][7], &tipo, &color, &v);
+    v = (Vector2){5, 7};
+    nuevaPiezaViva(&t->piezas[5][7], &tipo, &color, &v);
+
+    // Caballos
+    tipo = Caballo;
+    // Caballos blancos
+    v = (Vector2){1, 0};
+    color = Blanca;
+    nuevaPiezaViva(&t->piezas[1][0], &tipo, &color, &v);
+    v = (Vector2){6, 0};
+    nuevaPiezaViva(&t->piezas[6][0], &tipo, &color, &v);
+
+    // Caballos negros
+    v = (Vector2){1, 7};
+    color = Negra;
+    nuevaPiezaViva(&t->piezas[1][7], &tipo, &color, &v);
+    v = (Vector2){6, 7};
+    nuevaPiezaViva(&t->piezas[6][7], &tipo, &color, &v);
+
+    // Torres
+    tipo = Torre;
+    // Torres blancas
+    v = (Vector2){0, 0};
+    color = Blanca;
+    nuevaPiezaViva(&t->piezas[0][0], &tipo, &color, &v);
+    v = (Vector2){7, 0};
+    nuevaPiezaViva(&t->piezas[7][0], &tipo, &color, &v);
+
+    // Torres negras
+    v = (Vector2){0, 7};
+    color = Negra;
+    nuevaPiezaViva(&t->piezas[0][7], &tipo, &color, &v);
+    v = (Vector2){7, 7};
+    nuevaPiezaViva(&t->piezas[7][7], &tipo, &color, &v);
+
+    // Damas
+    tipo = Reina;
+    // Dama blanca
+    v = (Vector2){3, 0};
+    color = Blanca;
+    nuevaPiezaViva(&t->piezas[3][0], &tipo, &color, &v);
+
+    // Dama negra
+    v = (Vector2){3, 7};
+    color = Negra;
+    nuevaPiezaViva(&t->piezas[3][7], &tipo, &color, &v);
+
+    // Reyes
+    tipo = Rey;
+    // Rey blanco
+    v = (Vector2){4, 0};
+    color = Blanca;
+    nuevaPiezaViva(&t->piezas[4][0], &tipo, &color, &v);
+
+    // Rey negro
+    v = (Vector2){4, 7};
+    color = Negra;
+    nuevaPiezaViva(&t->piezas[4][7], &tipo, &color, &v);
 }
 
 void iniciarTexturas(Tablero *t) {
-    const char *nombresBlancas[N] = {"alfil_blanco.png", "caballo_blanco.png",
-                                     "torre_blanca.png", "dama_blanca.png",
-                                     "rey_blanco.png",   "peon_blanco.png"};
+    const char *nombresBlancas[N] = {"peon_blanco.png",    "alfil_blanco.png",
+                                     "caballo_blanco.png", "torre_blanco.png",
+                                     "reina_blanco.png",    "rey_blanco.png"};
 
-    const char *nombresNegras[N] = {"alfil_negro.png", "caballo_negro.png",
-                                    "torre_negra.png", "dama_negra.png",
-                                    "rey_negro.png",   "peon_negro.png"};
+    const char *nombresNegras[N] = {"peon_negro.png",    "alfil_negro.png",
+                                    "caballo_negro.png", "torre_negro.png",
+                                    "reina_negro.png",    "rey_negro.png"};
 
     char workingDir[512];
     strcpy(workingDir, GetWorkingDirectory());
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < 6; i++) {
         char pathBlancas[512], pathNegras[512];
 
         snprintf(pathBlancas, sizeof(pathBlancas), "%s/static/%s", workingDir,
@@ -76,27 +147,48 @@ void dibujarTablero(Tablero *t) {
         for (int j = 0; j < N; j++) {
             const int x = i * TAMANIO_PIEZA;
             const int y = j * TAMANIO_PIEZA;
-            if (i % 2 == 0) {
-                if (j % 2 == 0) {
-                    color = WHITE;
-                } else {
-                    color = GRAY;
-                }
+
+            if ((i + j) % 2 == 0) {
+                color = WHITE;
             } else {
-                if (j % 2 == 0) {
-                    color = GRAY;
-                } else {
-                    color = WHITE;
-                }
+                color = GRAY;
             }
             DrawRectangle(x, y, TAMANIO_PIEZA, TAMANIO_PIEZA, color);
-            DrawText(TextFormat("%d %d %d", i + 1, j + 1, t->piezas[i][j].tipo),
-                     x, y, 17, GREEN);
-            if (t->piezas[i][j].tipo == Peon) {
-                if (t->piezas[i][j].color == Blanca) {
-                    DrawTexture(t->texturas.blancas[0], x, y, WHITE);
-                } else {
-                    DrawTexture(t->texturas.negras[0], x, y, WHITE);
+
+            Pieza pieza = t->piezas[i][j];
+            if (pieza.tipo != Vacio) {
+                int indiceTextura = -1;
+                switch (pieza.tipo) {
+                case Peon:
+                    indiceTextura = 0;
+                    break;
+                case Alfil:
+                    indiceTextura = 1;
+                    break;
+                case Caballo:
+                    indiceTextura = 2;
+                    break;
+                case Torre:
+                    indiceTextura = 3;
+                    break;
+                case Reina:
+                    indiceTextura = 4;
+                    break;
+                case Rey:
+                    indiceTextura = 5;
+                    break;
+                default:
+                    break;
+                }
+
+                if (indiceTextura >= 0) {
+                    if (pieza.color == Blanca) {
+                        DrawTexture(t->texturas.blancas[indiceTextura], x, y,
+                                    WHITE);
+                    } else if (pieza.color == Negra) {
+                        DrawTexture(t->texturas.negras[indiceTextura], x, y,
+                                    WHITE);
+                    }
                 }
             }
         }
