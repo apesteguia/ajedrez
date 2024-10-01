@@ -8,12 +8,19 @@ int main(void) {
 
     Tablero t;
     iniciarTexturas(&t);
+    iniciarTablero(&t);
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
         dibujarTablero(&t);
 
         EndDrawing();
+    }
+
+    for (int i = 0; i < N; i++) {
+        UnloadTexture(t.texturas.blancas[i]);
+        UnloadTexture(t.texturas.negras[i]);
     }
 
     CloseWindow();

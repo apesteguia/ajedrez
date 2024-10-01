@@ -11,5 +11,6 @@ void nuevaPiezaViva(Pieza *p, const TipoPieza *tipo, const ColorPieza *color,
 
 void nuevaPiezaVacia(Pieza *p, const Vector2 *pos) {
     p->vacia = true;
+    p->tipo = Vacio;
     p->pos = *pos;
 }

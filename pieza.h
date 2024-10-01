@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 typedef enum {
+    Vacio = 0,
     Peon,
     Alfil,
     Caballo,
