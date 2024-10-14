@@ -254,7 +254,6 @@ void movimientosPosibles(Tablero *t, Vector2 pos) {
     Pieza *p = &t->piezas[(int)pos.x][(int)pos.y];
 
     if (p->tipo == Peon) {
-        printf("PEON\n");
         Vector2 pasar;
         if (p->color == Blanca) {
             printf("PEON BLANCO\n");
@@ -265,13 +264,25 @@ void movimientosPosibles(Tablero *t, Vector2 pos) {
                 vec_push(t->movimientosPosibles, &pasar);
             }
         } else if (p->color == Negra) {
+            printf("PEON BLANCO\n");
             pasar = p->pos;
             pasar.y--; // Mueve el peón hacia abajo
             if (esPosible(t, &p->pos, &pasar)) {
                 vec_push(t->movimientosPosibles, &pasar);
             }
         }
+    } else if (p->tipo == Alfil) {
+        printf("ALFIL\n");
+    } else if (p->tipo == Caballo) {
+        printf("CABALLO\n");
+    } else if (p->tipo == Torre) {
+        printf("TORRE\n");
+    } else if (p->tipo == Rey) {
+        printf("REY\n");
+    } else if (p->tipo == Reina) {
+        printf("REINA\n");
     }
+
     vec_foreach(t->movimientosPosibles, mostrarVector);
 }
 

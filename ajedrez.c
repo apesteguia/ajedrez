@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "tablero.h"
 
-int main(void) {
+int main(int argc, char **argv) {
     InitWindow(WIDTH, HEIGHT, "Ajedrez - Mikel Apesteguia");
 
     SetTargetFPS(10);
